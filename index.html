@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="container mx-auto max-w-md bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-4 text-center">QR Code Generator</h1>
+        
+        <div class="mb-4">
+            <label for="qr-text" class="block mb-2">Enter Text/URL:</label>
+            <input type="text" id="qr-text" class="w-full p-2 border rounded" placeholder="Enter text for QR code">
+        </div>
+        
+        <div class="mb-4">
+            <label for="qr-size" class="block mb-2">QR Code Size:</label>
+            <select id="qr-size" class="w-full p-2 border rounded">
+                <option value="100">100x100</option>
+                <option value="200" selected>200x200</option>
+                <option value="300">300x300</option>
+                <option value="400">400x400</option>
+            </select>
+        </div>
+        
+        <button id="generate-btn" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+            Generate QR Code
+        </button>
+        
+        <div id="qr-container" class="mt-4 text-center">
+            <canvas id="qr-canvas" class="mx-auto"></canvas>
+        </div>
+        
+        <div class="mt-4">
+            <button id="download-btn" class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 hidden">
+                Download QR Code
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const qrTextInput = document.getElementById('qr-text');
+        const qrSizeSelect = document.getElementById('qr-size');
+        const generateBtn = document.getElementById('generate-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const qrCanvas = document.getElementById('qr-canvas');
+
+        generateBtn.addEventListener('click', () => {
+            const text = qrTextInput.value.trim();
+            const size = parseInt(qrSizeSelect.value);
+
+            if (!text) {
+                alert('Please enter text for the QR code');
+                return;
+            }
+
+            // Clear previous QR code
+            qrCanvas.innerHTML = '';
+            
+            // Generate QR Code
+            QRCode.toCanvas(qrCanvas, text, {
+                width: size,
+                height: size
+            }, (error) => {
+                if (error) {
+                    console.error(error);
+                    alert('Error generating QR code');
+                } else {
+                    downloadBtn.classList.remove('hidden');
+                }
+            });
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'qr-code.png';
+            link.href = qrCanvas.toDataURL();
+            link.click();
+        });
+
+        // Preset QR Codes for Grocery Products
+        const presetProducts = [
+            'PRODUCT_MILK_001',
+            'PRODUCT_BREAD_002',
+            'PRODUCT_EGGS_003',
+            'PRODUCT_CHEESE_004',
+            'PRODUCT_BUTTER_005',
+            'PRODUCT_YOGURT_006',
+            'PRODUCT_PASTA_007',
+            'PRODUCT_RICE_008',
+            'PRODUCT_SAUCE_009',
+            'PRODUCT_CEREAL_010'
+        ];
+
+        // Optional: Add preset buttons
+        const presetContainer = document.createElement('div');
+        presetContainer.classList.add('mt-4', 'grid', 'grid-cols-2', 'gap-2');
+        
+        presetProducts.forEach(product => {
+            const btn = document.createElement('button');
+            btn.textContent = `Generate ${product}`;
+            btn.classList.add('bg-gray-200', 'p-2', 'rounded', 'hover:bg-gray-300');
+            btn.addEventListener('click', () => {
+                qrTextInput.value = product;
+                generateBtn.click();
+            });
+            presetContainer.appendChild(btn);
+        });
+
+        document.querySelector('.container').appendChild(presetContainer);
+    </script>
+</body>
+</html>
